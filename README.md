@@ -1,6 +1,6 @@
-# advent-of-code
-Advent of code
+# Advent of Code
 
-# Tech
+### 2022
+
 - Powershell
-- Pester
+- [Pester](https://pester.dev)
