@@ -23,10 +23,12 @@ function GetFirstMarker([string]$line, $Starter) {
 
 foreach ($line in $data) {
     if ($line) {
+        Write-Host $line
         $pack = GetFirstMarker $line $START_OF_PACK
         Write-Host "FIRST PACK MARKER : $pack"
         $msg = GetFirstMarker $line $START_OF_MSG
         Write-Host "FIRST MESSAGE MARKER : $msg"
+        Write-Host
     }
 }
 
