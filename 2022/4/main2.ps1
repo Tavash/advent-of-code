@@ -2,9 +2,7 @@
 Param([string]$InputFile)
 $data = Get-Content $InputFile
 
-$result = @{}
 $count = 1
-
 
 function BuildSection([string]$pair) {
     $splitted = $pair -split '-'
