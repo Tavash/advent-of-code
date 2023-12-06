@@ -1,9 +1,8 @@
 [Cmdletbinding()]
 Param([string]$InputFile)
 
-function GetData($data) {
+function ParseData($data) {
     $allData = @{}
-
     $stepIndex = 0
     foreach ($line in ($data | Select-Object -Skip 1)) {
         if ([string]::IsNullOrWhiteSpace($line)) { continue }
@@ -14,87 +13,47 @@ function GetData($data) {
             $stepIndex++
         }
         else {
-            $parts = [bigint[]]$line.split(" ", [System.StringSplitOptions]::RemoveEmptyEntries)
-            $allData.$stepName += @{ src = $parts[1]; dest = $parts[0]; range = $parts[2] }
+            $parts = [long[]]$line.split(" ", [System.StringSplitOptions]::RemoveEmptyEntries)
+            $allData.$stepName += @{ inStart = $parts[1]; inEnd = $parts[1] + $parts[2] - 1; outStart = $parts[0] ; range = $parts[2] }
         }
     }
-
     return $allData
 }
 
-function ProcessData ($data) {
-    $seeds = [bigint[]]$data[0].split(":", [System.StringSplitOptions]::RemoveEmptyEntries)[1].split(" ", [System.StringSplitOptions]::RemoveEmptyEntries)
+function ChallengeOne ($data) {
+    $seeds = [long[]]$data[0].split(":", [System.StringSplitOptions]::RemoveEmptyEntries)[1].split(" ", [System.StringSplitOptions]::RemoveEmptyEntries)
+    $allData = ParseData $data
 
-    $allData = GetData $data
-
-    [Collections.Generic.Dictionary[bigint, bigint]]$result = @{}
-    $seeds | ForEach-Object { $result.Add($_, $_) }
-
-    Write-Host "Seed: $($result.Keys -join ',')"
-
-    [bigint]$seed = 280775197
     $allData.Keys | Sort-Object | ForEach-Object {
         Write-Host "Processing Step: $_ "
         $step = $_
-        [Collections.Generic.Dictionary[bigint, bigint]]$pairs = @{}
-
-        $list = $allData.$step | Sort-Object -Property src
-        $srcMax = $list | Measure-Object -Maximum -Property src | Select-Object -ExpandProperty Maximum
-
-        for ([bigint]$i = 0; $i -le [bigint]$srcMax; $i = $i + 1) { $pairs.Add($i, $i) }
-
-        foreach ($tmp in $list) {
-            Write-Host "$($tmp.src) -> $($tmp.dest) ($($tmp.range))"
-            $dest = $tmp.dest
-            for ([bigint]$k = [bigint]$tmp.src; $k -le [bigint]($tmp.src + $tmp.range); $k = $k + 1) {
-                $pairs[$k] = $dest
-                $dest = $dest + 1
+        $newEntries = @()
+        $seeds | ForEach-Object {
+            $seed = $_
+            $newIn = $seed
+            foreach ($val in $allData.$step) {
+                if ($seed -ge $val.inStart -and $seed -le $val.inEnd) {
+                    $newIn = $val.outStart - $val.inStart + $seed
+                    break
+                }
             }
+            $newEntries += $newIn
         }
-        # $pairs.Keys | ForEach-Object { Write-Host "*$_* -> *$($pairs[$_])*" }
-        if ($pairs.ContainsKey($seed)) {
-            $seed = $pairs[$seed]
-        }
-        # $result.Keys | ForEach-Object {
-        #     if ($pairs.ContainsKey($result.$_)) {
-        #         $result.$_ = $pairs[$result.$_]
-        #     }
-        # }
-        Write-Host "$seed"
+        $seeds = $newEntries
     }
-    Write-Host "Seed: $seed"
+    Write-Host $seeds
+    $minValue = $seeds | Measure-Object -Minimum | Select-Object -ExpandProperty Minimum
 
-    $result.Keys | ForEach-Object {
-        Write-Host "$_ -> $($result[$_])"
-    }
-    $minValue = $result.Values | Measure-Object -Minimum | Select-Object -ExpandProperty Minimum
-
-    Write-Host "Challenge 1: $minValue"
+    return $minValue
 }
 
 
 
 function Main {
-    $result = ProcessData $(Get-Content $InputFile)
+    $inputContent = $(Get-Content $InputFile)
 
-    # Write-Host "Challenge One: $challengeOne"
+    Write-Host "Challenge One: $(ChallengeOne $inputContent)"
     # Write-Host "Challenge Two: $challengeTwo"
 }
 
 Main
-
-# if ($seed -lt $list[0].src -and $list[0].src -gt 0) {
-#     continue
-# }
-# else {
-# for ($i = 0; $i -lt ($list.Count - 1); $i++) {
-#     if ($i -le $list.Count) {
-#         if ($seed -ge $list[$i].src -and $seed -le $list[$i + 1].src) {
-
-#         }
-#     }
-#     else {
-
-#     }
-# }
-# }
