@@ -47,13 +47,43 @@ function ChallengeOne ($data) {
     return $minValue
 }
 
+function ChallengeTwo ($data) {
+    # $seeds = [long[]]$data[0].split(":", [System.StringSplitOptions]::RemoveEmptyEntries)[1].split(" ", [System.StringSplitOptions]::RemoveEmptyEntries)
+    $seeds = [System.Collections.ArrayList]@()
+    @(280775197..(280775197 + 7535297)).foreach({ $null = $seeds.Add($_) })
+    Write-Host "SEEDS POPULATED : $($seeds.Count)"
 
+    $allData = ParseData $data
+
+    $allData.Keys | Sort-Object | ForEach-Object {
+        Write-Host "Processing Step: $_ "
+        $step = $_
+        $newEntries = @()
+        # foreach ($seed in $seeds) {
+        $seeds.foreach({
+                $newIn = $seed
+                foreach ($val in $allData.$step) {
+                    if ($seed -ge $val.inStart -and $seed -le $val.inEnd) {
+                        $newIn = $val.outStart - $val.inStart + $seed
+                        break
+                    }
+                }
+                $newEntries += $newIn
+                # }
+            })
+        $seeds = $newEntries
+    }
+    Write-Host $seeds
+    $minValue = $seeds | Measure-Object -Minimum | Select-Object -ExpandProperty Minimum
+
+    return $minValue
+}
 
 function Main {
     $inputContent = $(Get-Content $InputFile)
 
-    Write-Host "Challenge One: $(ChallengeOne $inputContent)"
-    # Write-Host "Challenge Two: $challengeTwo"
+    # Write-Host "Challenge One: $(ChallengeOne $inputContent)"
+    Write-Host "Challenge Two: $(ChallengeTwo $inputContent)"
 }
 
 Main
