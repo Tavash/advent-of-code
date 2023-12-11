@@ -16,23 +16,18 @@ function ProcessData ($data) {
     $script:emptyCols = 0..($matrix[0].Count - 1) | Where-Object { $col = $_; -not ($matrix | ForEach-Object { $_[$col] } | Where-Object { $_ -eq '#' }) }
 
     $c1 = 0
-    for ($i = 0; $i -lt $galaxyCoords.Count; $i++) {
-        for ($j = $i + 1; $j -lt $galaxyCoords.Count; $j++) {
-            $c1 += GetDistance $galaxyCoords[$i] $galaxyCoords[$j]
-        }
-    }
-
     $c2 = 0
     for ($i = 0; $i -lt $galaxyCoords.Count; $i++) {
         for ($j = $i + 1; $j -lt $galaxyCoords.Count; $j++) {
-            $c2 += GetDistance $galaxyCoords[$i] $galaxyCoords[$j] (1e6 - 1)
+            $c1 += GetCustomManhattanDistance $galaxyCoords[$i] $galaxyCoords[$j]
+            $c2 += GetCustomManhattanDistance $galaxyCoords[$i] $galaxyCoords[$j] (1e6 - 1)
         }
     }
 
     return @{ c1 = $c1; c2 = $c2 }
 }
 
-function GetDistance($a, $b, $expansion = 1) {
+function GetCustomManhattanDistance($a, $b, $expansion = 1) {
     $a = [int[]]$a.Split(",")
     $b = [int[]]$b.Split(",")
     $a1 = (@($a[0], $b[0]) | Measure-Object -Minimum).Minimum
