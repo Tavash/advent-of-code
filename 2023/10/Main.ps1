@@ -29,7 +29,32 @@ function ProcessData ($data) {
         }
     }
 
-    return @{ c1 = $(($path.Count - 1) / 2) }
+    # Challenge 2 : Ray casting algorithm (https://rosettacode.org/wiki/Ray-casting_algorithm)
+    $matrix[$start.Split(",")[0]][$start.Split(",")[1]] = "|"
+    $c2 = 0
+    for ($x = 0; $x -lt $matrix.Count; $x++) {
+        for ($y = 0; $y -lt $matrix[$x].Count; $y++) {
+            if ("$x,$y" -notin @($path)) {
+                $edgeCrossingCount = CountEdgeCrossing $matrix[$x] $path $x $y
+                if ($edgeCrossingCount % 2 -eq 1) {
+                    $c2 += 1
+                }
+            }
+        }
+    }
+
+    return @{ c1 = $(($path.Count - 1) / 2); c2 = $c2 }
+}
+
+# If odd, element is inside the polygon
+# If even, element is outside the polygon
+function CountEdgeCrossing($line, $path, $x, $y) {
+    $count = 0
+    foreach ($k in 0..($y - 1)) {
+        if ("$x,$k" -notin $path) { continue }
+        $count += $line[$k] -in @( "J", "L", "|" )
+    }
+    return $count
 }
 
 function GetNextDirections($matrix, $x, $y) {
@@ -51,7 +76,7 @@ function Main {
     $result = ProcessData $data
 
     Write-Host "Challenge One: $($result.c1)"
-    # Write-Host "Challenge Two: $($result.c2)"
+    Write-Host "Challenge Two: $($result.c2)"
 }
 
 Main
