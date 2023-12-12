@@ -1,5 +1,7 @@
 from functools import lru_cache
 
+import time
+
 @lru_cache # 💯🔥 memoize => https://wellsr.com/python/optimizing-recursive-functions-with-python-memoization/
 def get_arrangements(row,group):
     row = row.lstrip('.') # supprime les '.' au début de la ligne
@@ -54,6 +56,8 @@ def get_arrangements(row,group):
 with open("input.txt") as input_file:
     input_lines = input_file.readlines()
 
+start_time = time.time()
+
 c1 = 0
 c2 = 0
 for line in input_lines:
@@ -69,5 +73,7 @@ for line in input_lines:
 print("Challenge 1:", c1)
 print("Challenge 2:", c2)
 
-# test = get_arrangements("?###????????", (3,2,1))
+print("--- %s seconds ---" % (time.time() - start_time))
+
+# test = get_arrangements("?".join(["?.?.???????##?????"] * 5), (1,2,8)*5)
 # print(test)
