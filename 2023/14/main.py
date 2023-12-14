@@ -37,6 +37,8 @@ def count_total_load(matrix):
         for i in range(len(row)):
             if row[i] == "O":
                 total += len(row) - i
+    # copilot optimisation 👀
+    # total = sum(len(row) - i for row in matrix for i, val in enumerate(row) if val == "O")
     return total
 
 
