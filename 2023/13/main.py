@@ -1,5 +1,3 @@
-from copy import deepcopy
-
 import time
 
 start_time = time.time()
@@ -67,7 +65,7 @@ def challenge_two(grid: list[str]):
     result = 0
     for i in range(nLines):
         for j in range(nCols):
-            gridCopy = deepcopy(grid)
+            gridCopy = grid.copy()
             temp = list(gridCopy[i])
             if grid[i][j] == "#":
                 temp[j] = '.'
