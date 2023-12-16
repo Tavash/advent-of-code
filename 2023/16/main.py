@@ -32,17 +32,18 @@ def get_energized_count(start=(0, 0, "R")):
             continue
 
         visited.add((x, y, direction))
+        dx, dy = directions[direction]
 
         if matrix[x][y] == "/":
             direction = mirrors[(direction, "/")]
         elif matrix[x][y] == "\\":
             direction = mirrors[(direction, "\\")]
         elif matrix[x][y] == "-":
-            if directions[direction][0]:
+            if dx:
                 direction = "R"
                 beams.append((x, y, "L"))
         elif matrix[x][y] == "|":
-            if directions[direction][1]:
+            if dy:
                 direction = "D"
                 beams.append((x, y, "U"))
 
